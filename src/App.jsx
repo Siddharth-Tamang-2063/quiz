@@ -120,6 +120,8 @@ const styles = `
   .btn-primary:active { transform: scale(0.98); }
   .btn-secondary { background: var(--card); color: var(--text); border: 1.5px solid var(--border); padding: 0.85rem 2rem; border-radius: 50px; font-size: 1rem; font-weight: 500; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.2s; }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-terminate { background: none; border: 1.5px solid var(--danger); border-radius: 50px; padding: 0.4rem 1.1rem; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--danger); font-family: 'Outfit', sans-serif; transition: all 0.2s; }
+  .btn-terminate:hover { background: rgba(220,38,38,0.1); }
 
   /* SELECTION */
   .selection-wrap { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
@@ -268,6 +270,16 @@ export default function App() {
     nextQuestion(opt, false);
   };
 
+  const terminateQuiz = () => {
+    clearInterval(timerRef.current);
+    setQIndex(0);
+    setAnswers([]);
+    setChosen(null);
+    setLocked(false);
+    setTimeLeft(TIMER_DURATION);
+    setPage("selection");
+  };
+
   const resetScores = () => {
     setScores({});
     localStorage.removeItem("qa_scores");
@@ -358,7 +370,10 @@ export default function App() {
         <div className="qa-page">
           <div className="quiz-wrap">
             <div className="quiz-meta">
-              <span className="q-counter">Question {qIndex + 1} / {questions.length}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span className="q-counter">Question {qIndex + 1} / {questions.length}</span>
+                <button className="btn-terminate" onClick={terminateQuiz}>✕ Terminate</button>
+              </div>
               <div className="timer-ring">
                 <div className="timer-bar-track">
                   <div className="timer-bar-fill" style={{ width: `${timerPct}%`, background: timerColor }} />
