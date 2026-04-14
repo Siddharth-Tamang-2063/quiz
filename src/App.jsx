@@ -64,7 +64,7 @@ const generateQuizData = () => {
 };
 
 const QUIZ_SETS = generateQuizData();
-const TIMER_DURATION = 15;
+const TIMER_DURATION = 25;
 
 // ─── SOUNDS ───────────────────────────────────────────────────────────────────
 const playSound = (type) => {
@@ -268,9 +268,12 @@ export default function App() {
     nextQuestion(opt, false);
   };
 
-  const correctCount = answers.filter(a => a.isCorrect).length;
+  const resetScores = () => {
+    setScores({});
+    localStorage.removeItem("qa_scores");
+  };
   const timerPct = (timeLeft / TIMER_DURATION) * 100;
-  const timerColor = timeLeft > 8 ? "#4f46e5" : timeLeft > 4 ? "#d97706" : "#dc2626";
+  const timerColor = timeLeft > 15 ? "#4f46e5" : timeLeft > 7 ? "#d97706" : "#dc2626";
 
   const getScoreMessage = (s, t) => {
     const p = s / t;
@@ -304,7 +307,7 @@ export default function App() {
             <div className="home-stats">
               <div className="stat-item"><div className="stat-num">100</div><div className="stat-label">Quiz Sets</div></div>
               <div className="stat-item"><div className="stat-num">500</div><div className="stat-label">Questions</div></div>
-              <div className="stat-item"><div className="stat-num">15s</div><div className="stat-label">Per Question</div></div>
+              <div className="stat-item"><div className="stat-num">25s</div><div className="stat-label">Per Question</div></div>
             </div>
             <button className="btn-primary" onClick={() => setPage("selection")}>Start Quiz →</button>
           </div>
@@ -317,6 +320,9 @@ export default function App() {
           <div className="selection-wrap">
             <h2 className="section-title">Choose a Quiz Set</h2>
             <p className="section-sub">Select from 100 quiz sets — each with 5 Nepali questions. ✓ marks your completed sets.</p>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+              <button className="btn-secondary" style={{ fontSize: "0.85rem", padding: "0.5rem 1.2rem", color: "var(--danger)", borderColor: "var(--danger)" }} onClick={() => { if (window.confirm("Reset all scores? This cannot be undone.")) resetScores(); }}>🔄 Reset All Scores</button>
+            </div>
             <div className="quiz-grid">
               {Array.from({ length: 100 }, (_, i) => {
                 const s = scores[i];
@@ -338,7 +344,7 @@ export default function App() {
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-icon">🎯</div>
             <h3 className="modal-title">Ready for Set #{(selectedSet || 0) + 1}?</h3>
-            <p className="modal-desc">5 questions · 15 seconds each · Questions in Nepali<br />{scores[selectedSet] !== undefined && `Your best: ${scores[selectedSet]}/5`}</p>
+            <p className="modal-desc">5 questions · 25 seconds each · Questions in Nepali<br />{scores[selectedSet] !== undefined && `Your best: ${scores[selectedSet]}/5`}</p>
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
               <button className="btn-primary" onClick={startQuiz}>Start Quiz</button>
@@ -367,7 +373,7 @@ export default function App() {
               <div className="q-set-label">Set #{(selectedSet || 0) + 1}</div>
               <p className="q-text">{currentQ.question}</p>
             </div>
-            <div className="options-grid">
+            <div className="options-grid" key={qIndex}>
               {(currentQ.options || []).map((opt, i) => {
                 const labels = ["A", "B", "C", "D"];
                 let cls = "";
